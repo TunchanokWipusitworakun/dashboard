@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <script src="https://cdn.jsdelivr.net/npm/vega@5.22.0"></script>
+  <script src="https://cdn.jsdelivr.net/npm/vega-lite@5.2.0"></script>
+  <script src="https://cdn.jsdelivr.net/npm/vega-embed@6.20.8"></script>
+</head>
+<body>
+  <div id="vis"/>
+  <script>
+    const spec = {
+  "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
+  "data": {
+    "url": "https://raw.githubusercontent.com/TunchanokWipusitworakun/vegamap/main/district.json",
+    "format": {"type": "topojson", "feature": "geodata"}
+  },
+  "transform": [
+    {
+      "lookup": "properties.dcode",
+      "from": {
+        "data": {
+          "url": "https://raw.githubusercontent.com/TunchanokWipusitworakun/vegamap/main/vegamap.csv"
+        },
+        "key": "dcode",
+        "fields": ["density"]
+      }
+    }
+  ],
+  "hconcat": [
+    {
+      "width": 400,
+      "height": 400,
+      "projection": {"type": "Mercator"},
+      "mark": {"type": "geoshape"},
+      "encoding": {
+        "color": {"field": "density", "type": "quantitative"},
+        "opacity": {"condition": {"param": "pts", "value": "1"}, "value": 0.3}
+      }
+    },
+    {
+      "width": 400,
+      "height": 400,
+      "mark": "bar",
+      "params": [
+        {
+          "name": "pts",
+          "select": {"type": "point", "encodings": ["x"], "on": "mouseover"}
+        }
+      ],
+      "encoding": {
+        "x": {"field": "properties.dcode", "type": "nominal"},
+        "y": {"field": "density", "type": "quantitative"},
+        "color": {"field": "density", "type": "quantitative"},
+        "opacity": {"condition": {"param": "pts", "value": 1}, "value": 0.5}
+      }
+    }
+  ],
+  "config": {}
+};
+    vegaEmbed("#vis", spec, {mode: "vega-lite"}).then(console.log).catch(console.warn);
+  </script>
+</body>
+</html>
